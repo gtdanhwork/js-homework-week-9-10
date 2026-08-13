@@ -1,22 +1,24 @@
 // TODO: Modal
 class EmployeeData {
-	#employeeArr;
+	#employees;
 	constructor() {
-		this.#employeeArr = [];
+		this.#employees = this.getLocalEmployeeData();
 	}
 
-	#getLocalEmployeeData() {
+	getLocalEmployeeData() {
 		if (localStorage.getItem('Employees') != null) {
-			this.#employeeArr = JSON.parse(localStorage.getItem('Employees'));
+			return JSON.parse(localStorage.getItem('Employees'));
 		}
+		return [];
 	}
 
-	#updateLocalEmployeeData(arr) {
-		localStorage.setItem('Employees', arr);
+	#updateLocalEmployeeData(employee) {
+		localStorage.setItem('Employees', employee);
 	}
 
 	addEmployeeData(employee) {
-		this.#employeeArr.push(employee);
+		this.#employees.push(employee);
+		this.#updateLocalEmployeeData(JSON.stringify(this.#employees));
 	}
 
 	deleteEmployeeData(employee) {}
@@ -26,25 +28,27 @@ class EmployeeData {
 	searchEmployee(query) {}
 }
 
+let employeeData = new EmployeeData();
+
 class Employees {
 	constructor(data) {
-		this.user = data.user;
-		this.fullName = data.fullName;
+		this.user = data.tknv;
+		this.fullName = data.name;
 		this.email = data.email;
 		this.password = data.password;
-		this.workDate = data.workDate;
-		this.baseSalary = data.baseSalary;
-		this.position = data.position;
-		this.workHours = data.workHours;
-		this.totalSalary = this.#calcSalary(data.salary, data.position);
-		this.rate = this.#evaluateRate(data.workHours);
+		this.workDate = data.datepicker;
+		this.baseSalary = data.luongCB;
+		this.position = data.chucvu;
+		this.workHours = data.gioLam;
+		this.totalSalary = this.#calcSalary(data.luongCB, data.chucvu);
+		this.rate = this.#evaluateRate(data.gioLam);
 	}
 
 	#calcSalary(salary, position) {
 		switch (position) {
-			case 'director':
+			case 'Sếp':
 				return salary * 3;
-			case 'manager':
+			case 'Trưởng Phòng':
 				return salary * 2;
 			default:
 				return salary * 1;
@@ -54,18 +58,16 @@ class Employees {
 	#evaluateRate(workHours) {
 		switch (true) {
 			case workHours < 160:
-				return 'Nhân viên trung bình';
+				return 'Trung bình';
 			case workHours < 176:
-				return 'Nhân viên khá';
+				return 'Khá';
 			case workHours < 192:
-				return 'Nhân viên giỏi';
+				return 'Giỏi';
 			default:
-				return 'Nhân viên xuất sắc';
+				return 'Xuất sắc';
 		}
 	}
 }
-
-// TODO: Lấy dữ liệu từ localStorage
 
 // TODO: Validate
 function formValidation(data) {
@@ -73,11 +75,11 @@ function formValidation(data) {
 
 	let tknv = document.querySelector('#tknv').value;
 	let tbTKNV = document.getElementById('tbTKNV');
-	const usernameRegex = /^[a-zA-Z0-9]{6,10}$/;
+	const usernameRegex = /^[a-zA-Z0-9]{4,10}$/;
 
 	if (!usernameRegex.test(tknv)) {
 		tbTKNV.style.display = 'revert';
-		tbTKNV.innerHTML = 'Tài khoản tối đa 4 - 6 ký số, không để trống';
+		tbTKNV.innerHTML = 'Tài khoản tối đa 4 - 6 ký tự, không để trống';
 		invalidCount++;
 	} else {
 		tbTKNV.style.display = '';
@@ -109,7 +111,7 @@ function formValidation(data) {
 	 * {2,}				- Tối thiểu từ 2 ký tự trở lên
 	 */
 	const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-	if (emailRegex.test(email)) {
+	if (!emailRegex.test(email)) {
 		tbEmail.style.display = 'revert';
 		tbEmail.innerHTML = 'Email phải đúng định dạng, không để trống';
 		invalidCount++;
@@ -119,11 +121,22 @@ function formValidation(data) {
 
 	let password = document.querySelector('#password').value;
 	let tbMatKhau = document.getElementById('tbMatKhau');
+	/**
+	 * Regex rules for Password
+	 * (?=.*[a-z]) 			- Tối thiểu 1 chữ cái thường
+	 * (?=.*[A-Z]) 			- Tối thiểu 1 chữ cái in hoa
+	 * (?=.*\d)	   			- Tối thiểu 1 chữ số
+	 * (?=.*[@$!%*#?&]) 	- Tối thiểu 1 ký tự đặc biệt trong khuôn
+	 * [A-Za-z\d@$!%*#?&]	- Bao gồm các chữ cái thường, in hoa, số, và ký tự đặc biệt
+	 * {6,10}				- Giới hạn từ 6 đến 10 ký tự
+	 */
 	const passwordRegex =
 		/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{6,10}$/;
+
 	if (!passwordRegex.test(password)) {
 		tbMatKhau.style.display = 'revert';
-		tbMatKhau.innerHTML = 'Email phải đúng định dạng, không để trống';
+		tbMatKhau.innerHTML =
+			'Mật Khẩu từ 6-10 ký tự (chứa ít nhất 1 ký tự số, 1 ký tự in hoa, 1 ký tự đặc biệt), không để trống';
 		invalidCount++;
 	} else {
 		tbMatKhau.style.display = '';
@@ -131,8 +144,9 @@ function formValidation(data) {
 
 	let datepicker = document.querySelector('#datepicker').value;
 	let tbNgay = document.getElementById('tbNgay');
+
 	const tempDate = new Date(datepicker);
-	if (isNaN(tempDate)) {
+	if (isNaN(tempDate) || datepicker.length < 8) {
 		tbNgay.style.display = 'revert';
 		tbNgay.innerHTML = 'Email phải đúng định dạng, không để trống';
 		invalidCount++;
@@ -140,10 +154,10 @@ function formValidation(data) {
 		tbNgay.style.display = '';
 	}
 
-	let luongCB = document.querySelector('#luongCB').value;
+	let luongCB = Number(document.querySelector('#luongCB').value);
 	let tbLuongCB = document.getElementById('tbLuongCB');
 
-	if (luongCB < 1000000 && luongCB > 20000000) {
+	if (luongCB < 1000000 || luongCB > 20000000) {
 		tbLuongCB.style.display = 'revert';
 		tbLuongCB.innerHTML =
 			'Lương cơ bản 1 000 000 - 20 000 000, không để trống';
@@ -163,9 +177,9 @@ function formValidation(data) {
 		tbChucVu.style.display = '';
 	}
 
-	let gioLam = document.querySelector('#gioLam').value;
+	let gioLam = Number(document.querySelector('#gioLam').value);
 	let tbGiolam = document.getElementById('tbGiolam');
-	if (luongCB < 80 && luongCB > 200) {
+	if (gioLam < 80 || gioLam > 200) {
 		tbGiolam.style.display = 'revert';
 		tbGiolam.innerHTML =
 			'Số giờ làm trong tháng 80 - 200 giờ, không để trống';
@@ -181,24 +195,58 @@ function formValidation(data) {
 
 	return true;
 }
-// TODO: Controllers
 
+// TODO: Controllers
 function addEmployee() {
 	let data = {
-		tknv = document.querySelector('#tknv').value,
-		name = document.querySelector('#name').value,
-		email = document.querySelector('#email').value,
-		password = document.querySelector('#password').value,
-		datepicker = document.querySelector('#datepicker').value,
-		luongCB = document.querySelector('#luongCB').value,
-		chucvu = document.querySelector('#chucvu').value,
-		gioLam = document.querySelector('#gioLam').value,
-	}
+		tknv: document.querySelector('#tknv').value,
+		name: document.querySelector('#name').value,
+		email: document.querySelector('#email').value,
+		password: document.querySelector('#password').value,
+		datepicker: document.querySelector('#datepicker').value,
+		luongCB: Number(document.querySelector('#luongCB').value),
+		chucvu: document.querySelector('#chucvu').value,
+		gioLam: Number(document.querySelector('#gioLam').value),
+	};
 
 	let isInvalid = formValidation(data);
 	if (!isInvalid) return;
 
-	let employeee = new Employees(data);
+	let employee = new Employees(data);
+
+	employeeData.addEmployeeData(employee);
+
+	displayEmployees();
+
+	document.querySelector('#btnDong').click();
 }
 
-document.querySelector('#tknv').addEventListener('click', addEmployee);
+function displayEmployees() {
+	let tableDanhSach = document.querySelector('#tableDanhSach');
+	let employees = employeeData.getLocalEmployeeData();
+	console.log(employees);
+	tableDanhSach.innerHTML = employees
+		.map((employee) => {
+			return `
+            <tr>
+                <td>${employee.user}</td>
+                <td>${employee.fullName}</td>
+                <td>${employee.email}</td>
+                <td>${employee.workDate}</td>
+                <td>${employee.position}</td>
+                <td>${employee.totalSalary}</td>
+                <td>${employee.rate}</td>
+                <td>
+                    <a>
+                        <i class="fa fa-pencil"></i>
+					</a>                    
+                </td>
+            </tr>
+        `;
+		})
+		.join('');
+}
+
+displayEmployees();
+
+document.querySelector('#btnThemNV').onclick = addEmployee;
