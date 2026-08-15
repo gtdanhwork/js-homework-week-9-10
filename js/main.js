@@ -12,6 +12,12 @@ class EmployeeData {
 		return [];
 	}
 
+	getEmployee(user) {
+		return this.#employees.findIndex((employee) => {
+			return employee.user == user;
+		});
+	}
+
 	#updateLocalEmployeeData(employee) {
 		localStorage.setItem('Employees', employee);
 	}
@@ -23,7 +29,13 @@ class EmployeeData {
 
 	deleteEmployeeData(employee) {}
 
-	editEmployeeData(employee) {}
+	editEmployeeData(user) {
+		let index = this.getEmployee(user);
+		if (index !== -1) {
+			return this.#employees[index];
+		}
+		console.log('Error, user not found.');
+	}
 
 	searchEmployee(query) {}
 }
@@ -221,6 +233,47 @@ function addEmployee() {
 	document.querySelector('#btnDong').click();
 }
 
+function updateEmployee(employee) {
+	resetEditEmployeeForm();
+	let employee = employeeData.getEmployee(employee);
+
+	// 	this.user = data.tknv;
+	// this.fullName = data.name;
+	// this.email = data.email;
+	// this.password = data.password;
+	// this.workDate = data.datepicker;
+	// this.baseSalary = data.luongCB;
+	// this.position = data.chucvu;
+	// this.workHours = data.gioLam;
+	// this.totalSalary = this.#calcSalary(data.luongCB, data.chucvu);
+	// this.rate = this.#evaluateRate(data.gioLam);
+
+	document.querySelector('#tknv').value = employee.user;
+	document.querySelector('#name').value = employee.fullName;
+	document.querySelector('#email').value = employee.email;
+	document.querySelector('#password').value = employee.password;
+	document.querySelector('#datepicker').value = employee.workDate;
+	document.querySelector('#luongCB').value = employee.baseSalary;
+	document.querySelector('#chucvu').value = employee.position;
+	document.querySelector('#gioLam').value = employee.workHours;
+
+	document.querySelector('#tknv').disabled = true;
+}
+
+function resetAddEmployeeForm() {
+	document.querySelector('#formEmployee').reset();
+	document.querySelector('#btnCapNhat').style.display = 'none';
+	document.querySelector('#btnThemNV').style.display = '';
+}
+
+document.querySelector('#btnThem').onclick = resetForm;
+
+function resetEditEmployeeForm() {
+	document.querySelector('#formEmployee').reset();
+	document.querySelector('#btnCapNhat').style.display = '';
+	document.querySelector('#btnThemNV').style.display = 'none';
+}
+
 function displayEmployees() {
 	let tableDanhSach = document.querySelector('#tableDanhSach');
 	let employees = employeeData.getLocalEmployeeData();
@@ -237,9 +290,12 @@ function displayEmployees() {
                 <td>${employee.totalSalary}</td>
                 <td>${employee.rate}</td>
                 <td>
-                    <a>
+                    <a id="btnUpdate" onclick="updateEmployee(${employee.user})">
                         <i class="fa fa-pencil"></i>
-					</a>                    
+					</a>            
+                    <a id="btnUpdate" onclick="updateEmployee(${employee.user})">
+                        <i class="fa fa-trash" aria-hidden="true"></i>
+					</a>                   
                 </td>
             </tr>
         `;
