@@ -13,9 +13,13 @@ class EmployeeData {
 	}
 
 	getEmployee(user) {
-		return this.#employees.findIndex((employee) => {
-			return employee.user == user;
+		const index = this.#employees.findIndex((employee) => {
+			return employee.user === user;
 		});
+
+		console.log(this.#employees[index]);
+
+		return this.#employees[index];
 	}
 
 	#updateLocalEmployeeData(employee) {
@@ -233,20 +237,13 @@ function addEmployee() {
 	document.querySelector('#btnDong').click();
 }
 
-function updateEmployee(employee) {
-	resetEditEmployeeForm();
-	let employee = employeeData.getEmployee(employee);
+function detailEmployee(user) {
+	document.querySelector('#formEmployee').reset();
+	document.querySelector('#btnCapNhat').style.display = '';
+	document.querySelector('#btnThemNV').style.display = 'none';
 
-	// 	this.user = data.tknv;
-	// this.fullName = data.name;
-	// this.email = data.email;
-	// this.password = data.password;
-	// this.workDate = data.datepicker;
-	// this.baseSalary = data.luongCB;
-	// this.position = data.chucvu;
-	// this.workHours = data.gioLam;
-	// this.totalSalary = this.#calcSalary(data.luongCB, data.chucvu);
-	// this.rate = this.#evaluateRate(data.gioLam);
+	let employee = employeeData.getEmployee(user);
+	console.log(employee);
 
 	document.querySelector('#tknv').value = employee.user;
 	document.querySelector('#name').value = employee.fullName;
@@ -266,13 +263,13 @@ function resetAddEmployeeForm() {
 	document.querySelector('#btnThemNV').style.display = '';
 }
 
-document.querySelector('#btnThem').onclick = resetForm;
+function updateEmployee(data) {}
 
-function resetEditEmployeeForm() {
-	document.querySelector('#formEmployee').reset();
-	document.querySelector('#btnCapNhat').style.display = '';
-	document.querySelector('#btnThemNV').style.display = 'none';
-}
+document.querySelector('#btnCapNhat').onclick = updateEmployee;
+
+document
+	.querySelector('#btnThem')
+	.addEventListener('click', resetAddEmployeeForm);
 
 function displayEmployees() {
 	let tableDanhSach = document.querySelector('#tableDanhSach');
@@ -290,10 +287,10 @@ function displayEmployees() {
                 <td>${employee.totalSalary}</td>
                 <td>${employee.rate}</td>
                 <td>
-                    <a id="btnUpdate" onclick="updateEmployee(${employee.user})">
+                    <a id="btnUpdate" onclick="detailEmployee('${employee.user}')" data-toggle="modal"data-target="#myModal">
                         <i class="fa fa-pencil"></i>
 					</a>            
-                    <a id="btnUpdate" onclick="updateEmployee(${employee.user})">
+                    <a id="btnDelete" onclick="">
                         <i class="fa fa-trash" aria-hidden="true"></i>
 					</a>                   
                 </td>
