@@ -48,7 +48,6 @@ function detailEmployee(user) {
 	document.querySelector('#btnThemNV').style.display = 'none';
 
 	let employee = employeeData.getEmployee(user);
-	console.log(employee);
 
 	document.querySelector('#tknv').value = employee.user;
 	document.querySelector('#name').value = employee.fullName;
@@ -63,7 +62,24 @@ function detailEmployee(user) {
 }
 
 function updateEmployee() {
-	
+	let data = {
+		tknv: document.querySelector('#tknv').value,
+		name: document.querySelector('#name').value,
+		email: document.querySelector('#email').value,
+		password: document.querySelector('#password').value,
+		datepicker: document.querySelector('#datepicker').value,
+		luongCB: Number(document.querySelector('#luongCB').value),
+		chucvu: document.querySelector('#chucvu').value,
+		gioLam: Number(document.querySelector('#gioLam').value),
+	};
+
+	formValidation(data);
+
+	if (!formValidation(data)) return;
+
+	let index = employees.getEmployeeIndex(data.tknv);
+
+	employees.updateEmployeeData(data, index);
 }
 
 document.querySelector('#btnCapNhat').onclick = updateEmployee;

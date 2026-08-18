@@ -21,8 +21,18 @@ class EmployeeData {
 		return this.#employees[index];
 	}
 
+	getEmployeeIndex(user) {
+		return this.#employees.findIndex((employee) => {
+			return employee.user === user;
+		});
+	}
+
 	#updateLocalEmployeeData(employee) {
 		localStorage.setItem('Employees', employee);
+	}
+
+	updateEmployeeData(employee, index) {
+		
 	}
 
 	addEmployeeData(employee) {
