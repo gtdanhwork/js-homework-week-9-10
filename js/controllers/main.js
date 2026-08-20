@@ -2,6 +2,8 @@
  * TODO: Thêm Nhân viên (Employee)
  */
 
+let employees = employeeData.getLocalEmployeeData();
+
 function resetAddEmployeeForm() {
 	document.querySelector('#formEmployee').reset();
 	document.querySelector('#btnCapNhat').style.display = 'none';
@@ -27,11 +29,11 @@ function addEmployee() {
 	let isInvalid = formValidation(data);
 	if (!isInvalid) return;
 
-	let employee = new Employees(data);
+	let employee = new Employee(data);
 
 	employeeData.addEmployeeData(employee);
 
-	displayEmployees();
+	displayEmployees(employeeData);
 
 	document.querySelector('#btnDong').click();
 }
@@ -77,40 +79,33 @@ function updateEmployee() {
 
 	if (!formValidation(data)) return;
 
-	let index = employees.getEmployeeIndex(data.tknv);
+	let index = employeeData.getEmployeeIndex(data.tknv);
 
-	employees.updateEmployeeData(data, index);
+	employeeData.updateEmployeeData(data, index);
+
+	displayEmployees(employeeData);
+
+	document.querySelector('#btnDong').click();
 }
 
 document.querySelector('#btnCapNhat').onclick = updateEmployee;
 
-function displayEmployees() {
-	let tableDanhSach = document.querySelector('#tableDanhSach');
-	let employees = employeeData.getLocalEmployeeData();
-	console.log(employees);
-	tableDanhSach.innerHTML = employees
-		.map((employee) => {
-			return `
-            <tr>
-                <td>${employee.user}</td>
-                <td>${employee.fullName}</td>
-                <td>${employee.email}</td>
-                <td>${employee.workDate}</td>
-                <td>${employee.position}</td>
-                <td>${employee.totalSalary}</td>
-                <td>${employee.rate}</td>
-                <td>
-                    <a id="btnUpdate" onclick="detailEmployee('${employee.user}')" data-toggle="modal"data-target="#myModal">
-                        <i class="fa fa-pencil"></i>
-					</a>            
-                    <a id="btnDelete" onclick="">
-                        <i class="fa fa-trash" aria-hidden="true"></i>
-					</a>                   
-                </td>
-            </tr>
-        `;
-		})
-		.join('');
+function deleteEmployee(user) {
+	employeeData.deleteEmployeeData(user);
+	displayEmployees(employeeData);
 }
 
-displayEmployees();
+let timeoutId;
+document.querySelector('#searchName').addEventListener('input', (e) => {
+	clearTimeout(timeoutId);
+
+	timeoutId = setTimeout(() => {
+		let result = employeeData.searchEmployee(e.target.value);
+		// displayEmployees(result);
+	}, 2000);
+});
+
+console.log(employeeData);
+
+// Refer to /views/displayEmployees.js
+displayEmployees(employees);

@@ -16,8 +16,6 @@ class EmployeeData {
 			return employee.user === user;
 		});
 
-		console.log(this.#employees[index]);
-
 		return this.#employees[index];
 	}
 
@@ -27,30 +25,54 @@ class EmployeeData {
 		});
 	}
 
-	#updateLocalEmployeeData(employee) {
-		localStorage.setItem('Employees', employee);
+	#updateLocalEmployeeData(employees) {
+		localStorage.setItem('Employees', JSON.stringify(employees));
 	}
 
 	updateEmployeeData(employee, index) {
-		
+		let tempEmployee = this.#employees[index];
+
+		console.log(tempEmployee);
+
+		tempEmployee.user = employee.tknv;
+		tempEmployee.fullName = employee.name;
+		tempEmployee.email = employee.email;
+		tempEmployee.password = employee.password;
+		tempEmployee.workDate = employee.datepicker;
+		tempEmployee.baseSalary = employee.luongCB;
+		tempEmployee.position = employee.chucvu;
+		tempEmployee.workHours = employee.gioLam;
+		tempEmployee.totalSalary = calcSalary(
+			employee.luongCB,
+			employee.chucvu,
+		);
+		tempEmployee.rate = evaluateRate(employee.gioLam);
+
+		console.log(tempEmployee);
+
+		this.#employees[index] = tempEmployee;
+		this.#updateLocalEmployeeData(this.#employees);
 	}
 
 	addEmployeeData(employee) {
 		this.#employees.push(employee);
-		this.#updateLocalEmployeeData(JSON.stringify(this.#employees));
+		this.#updateLocalEmployeeData(this.#employees);
 	}
 
-	deleteEmployeeData(employee) {}
-
-	updateEmployeeData(user) {
-		let index = this.getEmployee(user);
-		if (index !== -1) {
-			return this.#employees[index];
-		}
-		console.log('Error, user not found.');
+	deleteEmployeeData(employee) {
+		let index = this.getEmployeeIndex(employee.user);
+		this.#employees.splice(index, 1);
+		this.#updateLocalEmployeeData(this.#employees);
 	}
 
-	searchEmployee(query) {}
+	searchEmployee(query) {
+		console.log(query);
+		let temp = this.#employees.filter((employee) => {
+			employee.fullName.includes(query);
+		});
+		console.log(temp);
+		return temp;
+	}
 }
 
 let employeeData = new EmployeeData();
